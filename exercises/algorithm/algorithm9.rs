@@ -2,7 +2,6 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -23,7 +22,7 @@ where
     pub fn new(comparator: fn(&T, &T) -> bool) -> Self {
         Self {
             count: 0,
-            items: vec![T::default()],
+            items: Vec::new(),
             comparator,
         }
     }
@@ -38,6 +37,23 @@ where
 
     pub fn add(&mut self, value: T) {
         //TODO
+        self.items.push(value);
+        self.count += 1;
+
+        self.heapify_up();
+    }
+
+    fn heapify_up(&mut self){
+        let mut cur_index = self.count - 1;
+        while cur_index > 0 {
+            let parent_index = self.parent_idx(cur_index);
+            if (self.comparator)(&self.items[cur_index], &self.items[parent_index]) {
+                self.items.swap(cur_index, parent_index);
+                cur_index = parent_index;
+            } else {
+                break;
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -58,7 +74,31 @@ where
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
         //TODO
-		0
+		let mut cur_index = idx;
+        while cur_index < self.count {
+            cur_index = self.left_child_idx(cur_index);
+        }
+        cur_index
+    }
+
+    fn heapify_down(&mut self, mut index: usize) {        
+        loop {
+            let left_child = 2 * index + 1;
+            let right_child = 2 * index + 2;
+            
+            let mut chosen = index;
+            
+            if left_child < self.count && (self.comparator)(&self.items[left_child], &self.items[chosen]) {
+                chosen = left_child;
+            } else if right_child < self.count && (self.comparator)(&self.items[right_child], &self.items[chosen]) {
+                chosen = right_child;
+            } else {
+                break;
+            }
+            
+            self.items.swap(index, chosen);
+            index = chosen;
+        }
     }
 }
 
@@ -85,7 +125,15 @@ where
 
     fn next(&mut self) -> Option<T> {
         //TODO
-		None
+        if self.is_empty() {
+            return None;
+        }
+        self.items.swap(0, self.count - 1);
+        let result = self.items.pop();
+        self.count -= 1;
+
+        self.heapify_down(0usize);
+        return result;
     }
 }
 
@@ -151,4 +199,12 @@ mod tests {
         heap.add(1);
         assert_eq!(heap.next(), Some(2));
     }
+}
+
+fn main() {
+    let mut heap = MinHeap::new();
+    heap.add(4);
+    heap.add(2);
+    heap.add(9);
+    heap.add(11);
 }
