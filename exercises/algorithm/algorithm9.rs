@@ -200,11 +200,3 @@ mod tests {
         assert_eq!(heap.next(), Some(2));
     }
 }
-
-fn main() {
-    let mut heap = MinHeap::new();
-    heap.add(4);
-    heap.add(2);
-    heap.add(9);
-    heap.add(11);
-}
